@@ -16,19 +16,19 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-        UserSeeder::class,
-    ]);
-
-    // Buat 5 kategori
-        $categories = Category::factory()->count(30)->create();
-
-        // Buat 5 supplier
-        $suppliers = Supplier::factory()->count(30)->create();
-
-        // Buat 50 produk random
-        Product::factory()->count(50)->create([
-            'category_id' => fn () => $categories->random()->id,
-            'supplier_id' => fn () => $suppliers->random()->id,
+            UserSeeder::class,
         ]);
+
+        // // Buat 30 kategori
+        // $categories = Category::factory()->count(30)->create();
+
+        // // Buat 30 supplier
+        // $suppliers = Supplier::factory()->count(30)->create();
+
+        // // Buat 50 produk random
+        // Product::factory()->count(50)->create([
+        //     'category_id' => fn () => $categories->random()->id,
+        //     'supplier_id' => fn () => $suppliers->random()->id,
+        // ]);
     }
 }

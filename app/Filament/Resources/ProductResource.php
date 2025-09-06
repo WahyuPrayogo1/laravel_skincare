@@ -10,6 +10,8 @@ use Filament\Resources\Resource;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Illuminate\Support\HtmlString;
+use Filament\Tables\Columns\BadgeColumn;
+
 
 class ProductResource extends Resource
 {
@@ -24,6 +26,15 @@ class ProductResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                    Forms\Components\Select::make('status')
+    ->label('Status Produk')
+    ->options([
+        'new' => 'Produk Baru',
+        'best_seller' => 'Best Seller',
+    ])
+    ->default('normal')
+    ->required(),
+
                 Forms\Components\TextInput::make('kode_produk')
                     ->required()
                     ->maxLength(255),
@@ -88,6 +99,18 @@ class ProductResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->label('Nama Barang'),
+                   BadgeColumn::make('status')
+    ->formatStateUsing(fn (string $state): string => match ($state) {
+        'new' => 'Terbaru',
+        'best_seller' => 'Best Seller',
+        default => 'Tidak diketahui',
+    })
+    ->colors([
+        'success' => 'new',
+        'warning' => 'best_seller',
+    ]),
+
+
                 Tables\Columns\TextColumn::make('category.name')
                     ->label('Kategori'),
                 Tables\Columns\TextColumn::make('kode_produk')

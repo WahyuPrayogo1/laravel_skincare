@@ -5,42 +5,59 @@ namespace App\Filament\Widgets;
 use App\Models\Category;
 use Illuminate\Support\Facades\DB;
 use Filament\Widgets\ChartWidget;
+use Carbon\Carbon;
 
 class ExpiringSoonChart extends ChartWidget
 {
-    protected static ?string $heading = 'Hampir Expired (≤ 30 hari) per Kategori';
+    protected static ?string $heading = 'Produk Hampir Expired per Kategori';
 
     protected int|string|array $columnSpan = 'two-thirds';
 
     protected function getData(): array
     {
-        $cutoff = now()->addDays(30)->toDateString();
+        $today    = Carbon::now('Asia/Jakarta')->toDateString();
+        $cutoff7  = Carbon::now('Asia/Jakarta')->addDays(7)->toDateString();
+        $cutoff30 = Carbon::now('Asia/Jakarta')->addDays(30)->toDateString();
 
-        // hitung total per kategori
-        $rows = DB::table('products')
-            ->select('category_id', DB::raw('COUNT(*) as total'))
-            ->whereNotNull('expired_at')
-            ->whereDate('expired_at', '<=', $cutoff)
-            ->groupBy('category_id')
-            ->orderByDesc('total')
-            ->get();
+        // Ambil semua kategori supaya label konsisten
+        $categoryNames = Category::pluck('name', 'id');
 
-        $categoryNames = Category::whereIn('id', $rows->pluck('category_id'))
-            ->pluck('name', 'id');
+        $labels = $categoryNames->values()->toArray();
+        $data7  = [];
+        $data30 = [];
 
-        $labels = [];
-        $data   = [];
+        foreach ($categoryNames as $catId => $catName) {
+            // Produk expired ≤ 7 hari
+            $count7 = DB::table('products')
+                ->where('category_id', $catId)
+                ->whereNotNull('expired_at')
+                ->whereDate('expired_at', '>=', $today)
+                ->whereDate('expired_at', '<=', $cutoff7)
+                ->count();
 
-        foreach ($rows as $r) {
-            $labels[] = $categoryNames[$r->category_id] ?? 'Tanpa Kategori';
-            $data[]   = (int) $r->total;
+            // Produk expired 8–30 hari
+            $count30 = DB::table('products')
+                ->where('category_id', $catId)
+                ->whereNotNull('expired_at')
+                ->whereDate('expired_at', '>', $cutoff7)
+                ->whereDate('expired_at', '<=', $cutoff30)
+                ->count();
+
+            $data7[]  = $count7;
+            $data30[] = $count30;
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Hampir Expired (≤30 hari)',
-                    'data'  => $data,
+                    'label' => '≤ 7 Hari',
+                    'data'  => $data7,
+                    'backgroundColor' => '#facc15', // kuning
+                ],
+                [
+                    'label' => '8–30 Hari',
+                    'data'  => $data30,
+                    'backgroundColor' => '#f87171', // merah
                 ],
             ],
             'labels' => $labels,
@@ -49,6 +66,24 @@ class ExpiringSoonChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'bar'; // bisa diganti 'line' atau 'doughnut'
     }
+
+    protected function getOptions(): array
+{
+    return [
+        'scales' => [
+            'y' => [
+                'ticks' => [
+                    'display' => false, // hilangkan angka di sumbu Y
+                ],
+                'grid' => [
+                    'drawTicks' => false, // jangan gambar garis kecil di bawah angka
+                    'display' => true,    // grid line tetap tampil
+                ],
+            ],
+        ],
+    ];
+}
+
 }
