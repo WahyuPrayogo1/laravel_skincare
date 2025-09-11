@@ -15,6 +15,9 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+     protected $casts = [
+        'expired_at' => 'datetime', // <-- tambahkan ini
+    ];
 
     public function supplier()
     {

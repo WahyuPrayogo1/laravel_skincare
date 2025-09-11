@@ -52,6 +52,12 @@ class ProductResource extends Resource
                         'bulletList',
                         'numberedList',
                     ]),
+                    Forms\Components\TextInput::make('stock')
+    ->label('Stok')
+    ->numeric()
+    ->minValue(0)
+    ->required(),
+
                 Forms\Components\Select::make('category_id')
                     ->relationship('category', 'name')
                     ->required(),
@@ -77,11 +83,7 @@ class ProductResource extends Resource
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
                     ->helperText('Maksimal 2MB. Format: JPG, PNG'),
                 // Tambahkan field link_shopee
-                Forms\Components\TextInput::make('link_shopee')
-                    ->label('Link Shopee')
-                    ->url()
-                    ->maxLength(255)
-                    ->helperText('Masukkan link produk Shopee'),
+               
             ]);
     }
 
@@ -123,16 +125,11 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('expired_at')
                     ->date('d M Y')
                     ->label('Kedaluwarsa'),
-                // Tambahkan kolom link_shopee
-                Tables\Columns\TextColumn::make('link_shopee')
-                    ->label('Link Shopee')
-                    ->formatStateUsing(function ($state) {
-                        if ($state) {
-                            return new HtmlString('<a href="' . $state . '" target="_blank" class="text-primary-600 hover:text-primary-800">Lihat di Shopee</a>');
-                        }
-                        return '-';
-                    })
-                    ->html(),
+              Tables\Columns\TextColumn::make('stock')
+    ->label('Stok')
+    ->sortable()
+    ->searchable(),
+
                 Tables\Columns\TextColumn::make('description')
                     ->html()
                     ->limit(50)

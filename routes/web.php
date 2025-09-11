@@ -5,6 +5,24 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 
+use App\Models\Product;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ExpiredProductNotification;
+
+Route::get('/test-email', function () {
+    $products = Product::whereDate('expired_at', '<=', Carbon::now()->addDays(30))
+                       ->orderBy('expired_at', 'asc')
+                       ->get();
+
+    if ($products->count() > 0) {
+        Mail::to('wahyuprayogodev26@gmail.com')->send(new ExpiredProductNotification($products));
+        return 'Email sudah dikirim dengan ' . $products->count() . ' produk!';
+    }
+
+    return 'Tidak ada produk expired atau hampir expired.';
+});
+
 
 /*
 |--------------------------------------------------------------------------

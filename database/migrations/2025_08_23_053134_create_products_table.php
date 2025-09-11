@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('kode_produk');
             $table->string('image');
-            $table->string('link_shopee');
+            $table->string('link_shopee')->nullable();
             $table->text('description');
             $table->enum('status', ['new', 'best_seller', 'normal'])->default('normal');
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();

@@ -13,12 +13,26 @@
         }
 
         .single-categorie .cat-img img {
-    width: 100%;
-    height: 180px;       /* atur tinggi sesuai kebutuhan */
-    object-fit: cover;   /* potong gambar biar proporsional */
-    border-radius: 8px;  /* opsional, biar ada sudut rounded */
-}
+            width: 100%;
+            height: 180px;
+            /* atur tinggi sesuai kebutuhan */
+            object-fit: cover;
+            /* potong gambar biar proporsional */
+            border-radius: 8px;
+            /* opsional, biar ada sudut rounded */
+        }
 
+        .product-price-rating {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Pastikan tetap terlihat meskipun hover */
+        .single-makal-product:hover .product-price-rating {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
     </style>
     <!-- Main Header Area End Here -->
     <!-- Slider Area Start -->
@@ -71,32 +85,33 @@
     </div>
     <!-- Slider Area End -->
 
-<!-- Categorie Slider Area Start Here -->
-<div class="categories-of-pro pt-20">
-    <div class="container-fluid">
-        <!-- Categorie Product Activation Start Here -->
-        <div class="categorie-pro-active owl-carousel">
-            @foreach ($category as $cat)
-                <div class="single-categorie">
-                    <div class="cat-img">
-                        <a href="#">
-                            {{-- Kalau gambar kategori ada di storage --}}
-                            <img src="{{ asset('storage/' . $cat->images) }}" alt="{{ $cat->name }}">
-                        </a>
-                        <div class="cat-content">
-                            <a href="#">{{ $cat->name }}</a>
+    <!-- Categorie Slider Area Start Here -->
+    <div class="categories-of-pro pt-20">
+        <div class="container-fluid">
+            <!-- Categorie Product Activation Start Here -->
+            <div class="categorie-pro-active owl-carousel">
+                @foreach ($category as $cat)
+                    <div class="single-categorie">
+                        <div class="cat-img">
+                            <a href="#">
+                                {{-- Kalau gambar kategori ada di storage --}}
+                                <img src="{{ asset('storage/' . $cat->images) }}" alt="{{ $cat->name }}">
+                            </a>
+                            <div class="cat-content">
+                                <a href="#">{{ $cat->name }}</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
+            <!-- Categorie Product Activation End Here -->
         </div>
-        <!-- Categorie Product Activation End Here -->
     </div>
-</div>
-<!-- Categorie Slider Area End Here -->
+    <!-- Categorie Slider Area End Here -->
 
 
-    <!-- New Arrival Products Start Here -->
+   <!-- New Arrival Products Start Here -->
+@if ($latestProducts->count() > 0)
     <div class="new-arrival no-border-style ptb-90">
         <div class="container">
             <!-- Section Title Start -->
@@ -104,108 +119,85 @@
                 <h2>Produk Terbaru</h2>
                 <p>Dapatkan koleksi terbaru kami minggu ini</p>
             </div>
-
             <!-- Section Title End -->
 
             <div class="our-pro-active owl-carousel">
-                @foreach ($latestProducts as $product)
+                @forelse ($latestProducts as $product)
                     <div class="single-makal-product">
                         <div class="pro-img">
                             <a href="{{ route('product.show', $product->id) }}">
                                 <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
                             </a>
-
-                            </a>
-
                             <span class="sticker-new">new</span>
-
                         </div>
                         <div class="pro-content">
-                            <h4 class="pro-title">
+                            <h5 class="pro-title">
                                 <a href="{{ route('product.show', $product->id) }}">
                                     {{ $product->name }}
                                 </a>
-
-                            </h4>
-                            <p>
-                                <span class="price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                            </p>
-                            <div class="pro-actions">
-                                <div class="actions-primary">
-                                    <a href="{{ $product->link_shopee ?? '#' }}" class="add-to-cart" target="_blank">
-                                        Beli di Shopee
-                                    </a>
-                                </div>
-                                <div class="actions-secondary">
-                                    <div class="rating">
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                    </div>
+                            </h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="mb-0 product-price-rating">
+                                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                                </p>
+                                <div class="rating">
+                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                    <i class="fa fa-star" aria-hidden="true"></i>
+                                    <i class="fa fa-star" aria-hidden="true"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="text-center w-100">
+                        <p class="text-muted">Belum ada produk terbaru.</p>
+                    </div>
+                @endforelse
             </div>
         </div>
     </div>
-    <!-- New Arrival Products End Here -->
+@endif
+<!-- New Arrival Products End Here -->
 
 
-    <!-- Best Seller Products Start Here -->
-    <div class="best-seller no-border-style ptb-90">
-        <div class="container">
-            <!-- Section Title Start -->
-           <div class="section-title text-center">
-    <h2>Best Seller</h2>
-    <p>Produk favorit yang paling banyak dipilih pelanggan kami</p>
+<div class="our-pro-active owl-carousel">
+    @forelse ($bestSellers as $product)
+        <div class="single-makal-product">
+            <div class="pro-img">
+                <a href="{{ route('product.show', $product->id) }}">
+                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
+                </a>
+                <span class="sticker-new">best</span>
+            </div>
+            <div class="pro-content">
+                <h5 class="pro-title">
+                    <a href="{{ route('product.show', $product->id) }}">
+                        {{ $product->name }}
+                    </a>
+                </h5>
+                <div class="d-flex justify-content-between align-items-center">
+                    <p class="mb-0 product-price-rating">
+                        Rp {{ number_format($product->price, 0, ',', '.') }}
+                    </p>
+                    <div class="rating">
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                        <i class="fa fa-star" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @empty
+        <div class="text-center w-100">
+            <p class="text-muted">Belum ada produk best seller.</p>
+        </div>
+    @endforelse
 </div>
 
-            <div class="our-pro-active owl-carousel">
-                @foreach ($bestSellers as $product)
-                    <div class="single-makal-product">
-                        <div class="pro-img">
-                            <a href="{{ route('product.show', $product->id) }}">
-                                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                            </a>
-                            <span class="sticker-new">best</span>
-                        </div>
-                        <div class="pro-content">
-                            <h4 class="pro-title">
-                                <a href="{{ route('product.show', $product->id) }}">
-                                    {{ $product->name }}
-                                </a>
-                            </h4>
-                            <p>
-                                <span class="price">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                            </p>
-                            <div class="pro-actions">
-                                <div class="actions-primary">
-                                    <a href="{{ $product->link_shopee ?? '#' }}" class="add-to-cart" target="_blank">
-                                        Beli di Shopee
-                                    </a>
-                                </div>
-                                <div class="actions-secondary">
-                                    <div class="rating">
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-        </div>
-    </div>
-    <!-- Best Seller Products End Here -->
 
     <!-- New Product Banner Start Here -->
     <div class="product-banner pro-border-style">
