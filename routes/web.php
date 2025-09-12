@@ -16,7 +16,7 @@ Route::get('/test-email', function () {
                        ->get();
 
     if ($products->count() > 0) {
-        Mail::to('zaldinandika01@gmail.com')->send(new ExpiredProductNotification($products));
+        Mail::to('rhyagustina16@gmail.com')->send(new ExpiredProductNotification($products));
         return 'Email sudah dikirim dengan ' . $products->count() . ' produk!';
     }
 
