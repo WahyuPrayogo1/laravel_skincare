@@ -12,7 +12,6 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use Illuminate\Support\HtmlString;
 use Filament\Tables\Columns\BadgeColumn;
 
-
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
@@ -21,70 +20,42 @@ class ProductResource extends Resource
 
     public static function form(Forms\Form $form): Forms\Form
     {
-        return $form
-            ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                    Forms\Components\Select::make('status')
-    ->label('Status Produk')
-    ->options([
-        'new' => 'Produk Baru',
-        'best_seller' => 'Best Seller',
-    ])
-    ->default('normal')
-    ->required(),
+        return $form->schema([
+            Forms\Components\TextInput::make('name')->required()->maxLength(255),
+            Forms\Components\Select::make('status')
+                ->label('Status Produk')
+                ->options([
+                    'new' => 'Produk Baru',
+                    'best_seller' => 'Best Seller',
+                ])
+                ->default('normal')
+                ->required(),
 
-                Forms\Components\TextInput::make('kode_produk')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\RichEditor::make('description')
-                    ->required()
-                    ->maxLength(65535)
-                    ->columnSpanFull()
-                    ->toolbarButtons([
-                        'bold',
-                        'italic',
-                        'underline',
-                        'strike',
-                        'blockquote',
-                        'link',
-                        'bulletList',
-                        'numberedList',
-                    ]),
-                    Forms\Components\TextInput::make('stock')
-    ->label('Stok')
-    ->numeric()
-    ->minValue(0)
-    ->required(),
+            Forms\Components\TextInput::make('kode_produk')->required()->maxLength(255),
+            Forms\Components\RichEditor::make('description')
+                ->required()
+                ->maxLength(65535)
+                ->columnSpanFull()
+                ->toolbarButtons(['bold', 'italic', 'underline', 'strike', 'blockquote', 'link', 'bulletList', 'numberedList']),
+            Forms\Components\TextInput::make('stock')->label('Stok')->numeric()->minValue(0)->required(),
 
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
-                    ->required(),
-                Forms\Components\Select::make('supplier_id')
-                    ->relationship('supplier', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('price')
-                    ->numeric()
-                    ->prefix('Rp')
-                    ->required(),
-                Forms\Components\DatePicker::make('expired_at')
-                    ->label('Expired Date')
-                    ->required(),
-                // Tambahkan field image
-                Forms\Components\FileUpload::make('image')
-                    ->label('Gambar Produk')
-                    ->image()
-                    ->directory('products')
-                    ->maxSize(2048) // 2MB
-                    ->imageResizeMode('cover')
-                    ->imageResizeTargetWidth('300')
-                    ->imageResizeTargetHeight('300')
-                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
-                    ->helperText('Maksimal 2MB. Format: JPG, PNG'),
-                // Tambahkan field link_shopee
-               
-            ]);
+            Forms\Components\Select::make('category_id')->relationship('category', 'name')->required(),
+            Forms\Components\Select::make('supplier_id')->relationship('supplier', 'name')->required(),
+            Forms\Components\TextInput::make('price')->numeric()->prefix('Rp')->required(),
+            Forms\Components\DatePicker::make('expired_at')->label('Expired Date')->required(),
+            // Tambahkan field image
+            Forms\Components\FileUpload::make('image')
+                ->label('Gambar Produk')
+                ->image()
+                ->directory('products')
+                ->maxSize(2048) // 2MB
+                ->imageResizeMode('cover')
+                ->imageResizeTargetWidth('300')
+                ->imageResizeTargetHeight('300')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
+                ->helperText('Maksimal 2MB. Format: JPG, PNG'),
+            // Tambahkan field link_shopee
+        ]);
     }
 
     public static function table(Tables\Table $table): Tables\Table
@@ -92,66 +63,35 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 // Tambahkan kolom image
-                Tables\Columns\ImageColumn::make('image')
-                    ->label('Gambar')
-                    ->getStateUsing(fn ($record) => asset('storage/' . $record->image))
-                    ->circular()
-                    ->size(40),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable()
-                    ->label('Nama Barang'),
-                   BadgeColumn::make('status')
-    ->formatStateUsing(fn (string $state): string => match ($state) {
-        'new' => 'Terbaru',
-        'best_seller' => 'Best Seller',
-        default => 'Tidak diketahui',
-    })
-    ->colors([
-        'success' => 'new',
-        'warning' => 'best_seller',
-    ]),
+                Tables\Columns\ImageColumn::make('image')->label('Gambar')->getStateUsing(fn($record) => asset('storage/' . $record->image))->circular()->size(40),
+                Tables\Columns\TextColumn::make('name')->searchable()->sortable()->label('Nama Barang'),
+                BadgeColumn::make('status')
+                    ->formatStateUsing(
+                        fn(string $state): string => match ($state) {
+                            'new' => 'Terbaru',
+                            'best_seller' => 'Best Seller',
+                            default => 'Tidak diketahui',
+                        },
+                    )
+                    ->colors([
+                        'success' => 'new',
+                        'warning' => 'best_seller',
+                    ]),
 
+                Tables\Columns\TextColumn::make('category.name')->label('Kategori'),
+                Tables\Columns\TextColumn::make('kode_produk')->label('Kode Produk')->searchable(),
+                Tables\Columns\TextColumn::make('price')->formatStateUsing(fn($state) => 'Rp ' . number_format($state, 0, ',', '.'))->sortable()->label('Harga'),
+                Tables\Columns\TextColumn::make('created_at')->label('Ditambahkan Pada')->dateTime('d M Y')->sortable(),
+                Tables\Columns\TextColumn::make('expired_at')->date('d M Y')->label('Kedaluwarsa'),
+                Tables\Columns\TextColumn::make('stock')->label('Stok')->sortable()->searchable(),
 
-                Tables\Columns\TextColumn::make('category.name')
-                    ->label('Kategori'),
-                Tables\Columns\TextColumn::make('kode_produk')
-                    ->label('Kode Produk')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('price')
-                    ->formatStateUsing(fn ($state) => 'Rp ' . number_format($state, 0, ',', '.'))
-                    ->sortable()
-                    ->label('Harga'),
-                Tables\Columns\TextColumn::make('expired_at')
-                    ->date('d M Y')
-                    ->label('Kedaluwarsa'),
-              Tables\Columns\TextColumn::make('stock')
-    ->label('Stok')
-    ->sortable()
-    ->searchable(),
-
-                Tables\Columns\TextColumn::make('description')
-                    ->html()
-                    ->limit(50)
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('description')->html()->limit(50)->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->headerActions([
-                ExportAction::make()
-                    ->label('Export Excel')
-                    ->icon('heroicon-o-document-arrow-down')
-                    ->color('success'),
-            ])
-            ->bulkActions([
-                ExportBulkAction::make()
-                    ->label('Export Selected')
-                    ->icon('heroicon-o-document-arrow-down'),
-                Tables\Actions\DeleteBulkAction::make(),
-            ]);
+            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+            ->headerActions([ExportAction::make()->label('Export Excel')->icon('heroicon-o-document-arrow-down')->color('success')])
+            ->bulkActions([ExportBulkAction::make()->label('Export Selected')->icon('heroicon-o-document-arrow-down'), Tables\Actions\DeleteBulkAction::make()])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getPages(): array

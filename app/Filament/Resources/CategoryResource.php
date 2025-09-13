@@ -28,12 +28,15 @@ class CategoryResource extends Resource
                     ->label('Category Image')
                     ->image()
                     ->directory('categories')
+                    ->disk('public')
                     ->visibility('public')
                     ->maxSize(2048) // 2MB
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg', 'image/gif'])
                     ->getUploadedFileNameForStorageUsing(
-                        fn (TemporaryUploadedFile $file): string => (string) str($file->getClientOriginalName())
-                            ->prepend('category-'),
+                        fn (TemporaryUploadedFile $file): string =>
+                            'category-' .
+                            str(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME))->slug() .
+                            '.' . $file->getClientOriginalExtension(),
                     )
                     ->helperText('Max size: 2MB. Allowed types: jpeg, png, jpg, gif')
                     ->columnSpanFull(),
@@ -46,10 +49,12 @@ class CategoryResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
-                Tables\Columns\ImageColumn::make('images')
-                    ->label('Image')
-                    ->circular()
-                    ->defaultImageUrl(url('/storage/default-image.png')), // optional default image
+Tables\Columns\ImageColumn::make('images')
+    ->getStateUsing(fn ($record) => asset('storage/' . $record->images))
+    ->circular()
+    ->size(40),
+
+
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d M Y'),
             ])
             ->actions([
