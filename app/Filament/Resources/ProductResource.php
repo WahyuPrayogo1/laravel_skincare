@@ -88,7 +88,7 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('description')->html()->limit(50)->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([])
-            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make()])
+            ->actions([Tables\Actions\EditAction::make(), Tables\Actions\DeleteAction::make(),Tables\Actions\ViewAction::make()])
             ->headerActions([ExportAction::make()->label('Export Excel')->icon('heroicon-o-document-arrow-down')->color('success')])
             ->bulkActions([ExportBulkAction::make()->label('Export Selected')->icon('heroicon-o-document-arrow-down'), Tables\Actions\DeleteBulkAction::make()])
             ->defaultSort('created_at', 'desc');

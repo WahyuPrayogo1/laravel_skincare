@@ -23,4 +23,12 @@ class Product extends Model
     {
         return $this->belongsTo(Supplier::class);
     }
+    // Di Product.php
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) return null;
+
+        // Gunakan asset() untuk consistent URL
+        return asset('storage/' . $this->image);
+    }
 }

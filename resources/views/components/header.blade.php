@@ -9,10 +9,6 @@
                             <div class="col-auto header-top-left order-2 order-lg-1">
                                 <ul>
                                     <li>
-                                         <a href="tel:0123456789"><i class="fa fa-phone"></i>0123456789</a>
-                                    </li>
-
-                                    <li>
                                         <ul class="social-icon">
                                             <li>
                                                 <a href="#">
@@ -44,8 +40,8 @@
                             <!-- Logo Start -->
                             <div class="col-xl-3 col-lg-2 col-6">
                                 <div class="logo">
-                                    <a href="index-cosmetic.html">
-                                        <img src="{{asset('frontend/img/logo/logo.webp')}}" alt="logo-image">
+                                    <a href="{{url('/')}}">
+                                       Toko Kosmetik
                                     </a>
                                 </div>
                             </div>
