@@ -9,7 +9,8 @@
                     <div class="single-footer">
                         <div class="footer-logo mb-20">
                             <a href="{{ url('/') }}">
-                                <img class="img" src="{{ asset('frontend/img/logo/logo.webp') }}" alt="logo-img">
+                                Toko Kosmetik
+                                {{-- <img class="img" src="{{ asset('frontend/img/logo/logo.webp') }}" alt="logo-img"> --}}
                             </a>
                         </div>
                         <div class="footer-content">

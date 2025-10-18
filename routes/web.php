@@ -10,6 +10,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ExpiredProductNotification;
 
+
+Route::get('/produk', [HomeController::class, 'produk'])->name('pr');
+Route::get('/galeri', [HomeController::class, 'Galeri'])->name('galeri');
+Route::get('/tentang-kami', [HomeController::class, 'TentangKami'])->name('tentang-kami');
+Route::get('/kontak-kami', [HomeController::class, 'KontakKami'])->name('kontak-kami');
+
+
 Route::get('/test-email', function () {
     $products = Product::whereDate('expired_at', '<=', Carbon::now()->addDays(30))
                        ->orderBy('expired_at', 'asc')
